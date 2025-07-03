@@ -1,5 +1,4 @@
 
-
 import streamlit as st
 import pandas as pd
 import os
@@ -66,7 +65,7 @@ def show_student_panel():
             if not name.strip() or not roll.strip() or not token.strip():
                 st.warning("All fields are required.")
                 return
-
+            
             # --- NEW VALIDATION: Check if Roll Number is numeric ---
             if not roll.strip().isdigit():
                 st.warning("Roll Number must be numeric.")
@@ -104,7 +103,7 @@ def show_student_panel():
             except pd.errors.EmptyDataError:
                 # Handle case where CSV is empty but exists (e.g., just headers)
                 df = pd.DataFrame(columns=["Roll Number", "Name"])
-
+            
             # Ensure 'Roll Number' and 'Name' are present as columns for merging/indexing
             if "Roll Number" not in df.columns or "Name" not in df.columns:
                  st.error("Attendance file format error: 'Roll Number' or 'Name' columns missing.")
@@ -121,12 +120,12 @@ def show_student_panel():
 
             # 1. Check for duplicate attendance for today
             student_row_index = df[df["Roll Number"] == roll].index
-
+            
             already_marked = False
             if not student_row_index.empty:
                 if df.loc[student_row_index[0], current_date] == 'P':
                     already_marked = True
-
+            
             if already_marked:
                 st.warning("⚠️ You have already marked your attendance for today.")
                 return # Exit immediately if already marked
@@ -136,7 +135,7 @@ def show_student_panel():
             if limit is not None:
                 # Count current 'P' marks for today's column
                 present_count_today = (df[current_date] == 'P').sum()
-
+                
                 # If adding this student would exceed the limit, prevent marking
                 if present_count_today >= limit: # Use >= because this potential mark would make it +1
                     st.error("❌ Token limit reached. Attendance not recorded. Please contact your teacher.")
@@ -150,14 +149,14 @@ def show_student_panel():
             else:
                 # New student: Add new row and mark 'P' for today
                 new_student_data = {"Roll Number": roll, "Name": name}
-
+                
                 # Fill new_student_data with empty strings for existing date columns
                 for col in df.columns:
                     if col not in ["Roll Number", "Name"]:
                         new_student_data[col] = "" # Initialize existing date columns as absent
 
                 new_student_data[current_date] = 'P' # Mark present for today
-
+                
                 # Append the new student row
                 new_df_row = pd.DataFrame([new_student_data])
                 df = pd.concat([df, new_df_row], ignore_index=True)
@@ -173,4 +172,4 @@ def show_student_panel():
                 df.sort_values(by="Roll Number", inplace=True)
 
             df.to_csv(file_path, index=False)
-            st.rerun() # Rerun to clear form and update display if any. Same as another example code
+            st.rerun() # Rerun to clear form and update display if any.
