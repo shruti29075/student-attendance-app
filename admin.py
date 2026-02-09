@@ -6,9 +6,13 @@ import pickle
 
 # ---- Admin credentials ----
 # Read credentials from st.secrets (from .streamlit/secrets.toml or Streamlit Cloud secrets)
+ADMIN_USERNAME = st.secrets.get("ADMIN_USERNAME")
+ADMIN_PASSWORD = st.secrets.get("ADMIN_PASSWORD")
 
-ADMIN_USERNAME = st.secrets["ADMIN_USERNAME"]
-ADMIN_PASSWORD = st.secrets["ADMIN_PASSWORD"]
+if not ADMIN_USERNAME or not ADMIN_PASSWORD:
+    st.error("Admin credentials are not set in Streamlit secrets.")
+    st.stop()
+
 
 STATE_FILE = "streamlit_session.pkl"
 
